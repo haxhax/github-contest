@@ -1,0 +1,5 @@
+= GitHub Contest Entry
+
+== Strategy
+
+I'm starting pretty simple: a simple rand(), seeing how far that takes me.
