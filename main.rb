@@ -59,7 +59,7 @@ def push_to_redis
 end
 
 def main
-  srand(1_048_576)
+  srand(2*1_048_576)
   max_rid = rids.last
   tids.each do |tid|
     recommendations = (1..10).inject([]) {|memo, _| memo << 1 + rand(max_rid)}
