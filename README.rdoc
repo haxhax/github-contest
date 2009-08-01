@@ -3,3 +3,8 @@
 == Strategy
 
 I'm starting pretty simple: a simple rand(), seeing how far that takes me.
+
+== Data
+
+I have put the data in a Redis dump file.  This is a redis 0.900 dump.  You can access the
+data from http://s3.amazonaws.com/teksol/github-contest/dump.rdb.tar.gz

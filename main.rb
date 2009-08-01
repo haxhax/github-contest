@@ -12,8 +12,50 @@ def rids
   @rids ||= File.read("data/repos.txt").split("\n").map {|line| line.split(":", 2).first}.map {|n| n.to_i}.sort
 end
 
+def repos
+  @repos ||= File.read("data/repos.txt").split("\n").map {|line| line.split(":").map {|datum| datum.split(",")}.flatten}.inject(Hash.new) do |memo, data|
+    repo = Hash.new
+    repo[:name]    = data[1]
+    repo[:created] = data[2]
+    repo[:parent]  = data[3] if data[3]
+
+    memo[data.first.to_i] = repo
+    memo
+  end
+end
+
 def tids
   @tids ||= File.read("data/test.txt").split("\n").map {|n| n.to_i}
+end
+
+def push_to_redis
+  require "redis"
+  require "json"
+
+  redis = Redis.new
+  redis.flushdb
+  puts "Pushing watches"
+  redis.pipelined do |p|
+    uids_to_rids.each do |uid, rids|
+      rids.each do |rid|
+        p.sadd "#{uid}:watches", rid.to_s
+      end
+    end
+  end
+
+  puts "Pushing test UIDs"
+  redis.pipelined do |p|
+    tids.each do |tid|
+      p.sadd "test", tid.to_s
+    end
+  end
+
+  puts "Pushing repository data"
+  redis.pipelined do |p|
+    repos.each do |id, attrs|
+      p.set "repo:#{id}", attrs.to_json
+    end
+  end
 end
 
 def main
